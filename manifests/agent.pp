@@ -100,7 +100,9 @@ define bamboo_agent::agent (
 
   bamboo_agent::wrapper_conf { $service_name:
     home       => $home,
-    properties => $wrapper_conf_properties,
+    properties => $wrapper_conf_properties + {
+      'wrapper.app.parameter.2' => "${server_url}/agentServer/",
+    },
     notify     => Service[$service_name]
   }
 
