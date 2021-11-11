@@ -8,6 +8,7 @@
 # @param manage_groups Create the groups specified for bamboo agent user
 # @param manage_home If set to true, will create the home directory for the bamboo agent user
 # @param username Username for bamboo-agent service account
+# @param group Primary group for bamboo-agent service account
 # @param user_groups A list of groups to add the bamboo-agent user too
 # @param manage_capabilities Whether the module should manage the capabilities file for the agent
 # @param wrapper_conf_properties Additonal java arguments to put in wrapper.conf
@@ -23,6 +24,7 @@ define bamboo_agent::agent (
   Boolean          $manage_groups           = false,
   Boolean          $manage_home             = true,
   String           $username                = $title,
+  String           $group                   = $username,
   String           $service_name            = $title,
   Array            $user_groups             = [],
   Boolean          $manage_capabilities     = true,
@@ -104,6 +106,7 @@ define bamboo_agent::agent (
 
   bamboo_agent::service { $service_name:
     username  => $username,
+    group     => $group,
     home      => $home,
     java_home => $java_home,
     require   => Bamboo_Agent::Install[$service_name],

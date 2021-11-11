@@ -3,6 +3,7 @@
 # @param home home directory of the bamboo-agent user
 define bamboo_agent::service (
   String           $username,
+  String           $group,
   String           $home,
   String           $service_name = $title,
   Optional[String] $java_home = undef,
@@ -10,40 +11,14 @@ define bamboo_agent::service (
 
   assert_private()
 
-  case $::operatingsystem {
-    'Ubuntu': {
-      case $::lsbdistcodename {
-        'xenial': {
-          $init_path        = '/lib/systemd/system'
-          $service_template = 'bamboo_agent/unit.erb'
-          $initscript       = "${init_path}/${service_name}.service"
-        }
-        default: {
-          $init_path        = '/etc/init.d'
-          $service_template = 'bamboo_agent/init.sh.erb'
-          $initscript       = "${init_path}/${service_name}"
-        }
-      }
-    }
-    'Redhat','CentOS': {
-      case $::operatingsystemmajrelease {
-        '7': {
-          $init_path        = '/lib/systemd/system'
-          $service_template = 'bamboo_agent/unit.erb'
-          $initscript       = "${init_path}/${service_name}.service"
-        }
-        default: {
-          $init_path        = '/etc/init.d'
-          $service_template = 'bamboo_agent/init.sh.erb'
-          $initscript       = "${init_path}/${service_name}"
-        }
-      }
-    }
-    default: {
-      $init_path        = '/etc/init.d'
-      $service_template = 'bamboo_agent/init.sh.erb'
-      $initscript       = "${init_path}/${service_name}"
-    }
+  if $facts['service_provider'] == 'systemd' {
+    $init_path        = '/lib/systemd/system'
+    $service_template = 'bamboo_agent/unit.erb'
+    $initscript       = "${init_path}/${service_name}.service"
+  } else {
+    $init_path        = '/etc/init.d'
+    $service_template = 'bamboo_agent/init.sh.erb'
+    $initscript       = "${init_path}/${service_name}"
   }
 
   file {$initscript:
@@ -59,4 +34,5 @@ define bamboo_agent::service (
     enable  => true,
     require => File[$initscript],
   }
+
 }

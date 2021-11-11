@@ -1,13 +1,13 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides: bamboo
+# Provides: <%= @service_name %>
 # Required-Start: $local_fs $remote_fs $network $time
 # Required-Stop: $local_fs $remote_fs $network $time
 # Should-Start: $syslog
 # Should-Stop: $syslog
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
-# Short-Description: Atlassian Bamboo Server
+# Short-Description: Atlassian Bamboo Agent
 ### END INIT INFO
 # INIT Script
 ######################################
@@ -18,7 +18,7 @@
 # It was then hacked on a bit to actually work. :-(
 
 # Name of app ( bamboo, Confluence, etc )
-APP=<%= @username %>
+APP=<%= @service_name %>
 
 # Name of the user to run as
 USER=<%= @username %>
@@ -26,11 +26,13 @@ USER=<%= @username %>
 # Location of application's bin directory
 BASE=<%= @home %>
 
+<% if @java_home -%>
 export JAVA_HOME=<%= @java_home %>
 
+<% end -%>
 case "$1" in
   start)
-    chown -R <%= @username %>:<%= @username %> $BASE
+    chown -R <%= @username %>:<%= @group %> $BASE
     echo "Setting max locked memory"
     ulimit -l unlimited
     echo "Starting $APP"
@@ -50,7 +52,7 @@ case "$1" in
     /bin/su - $USER -c "$BASE/bin/bamboo-agent.sh status"
     ;;
   *)
-    echo "Usage: /etc/init.d/$APP {start|restart|stop}"
+    echo "Usage: /etc/init.d/$APP {start|restart|stop|status}"
     exit 1
     ;;
 esac
