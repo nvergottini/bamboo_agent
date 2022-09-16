@@ -17,22 +17,22 @@
 # @param uid Specify a value for the bamboo agent's user id
 # @param gid Specify a value for the bamboo agent's group id
 define bamboo_agent::agent (
-  String           $home,
-  String           $server_url,
-  Hash             $capabilities            = {},
-  Boolean          $manage_user             = true,
-  Boolean          $manage_groups           = false,
-  Boolean          $manage_home             = true,
-  String           $username                = $title,
-  String           $group                   = $username,
-  String           $service_name            = $title,
-  Array            $user_groups             = [],
-  Boolean          $manage_capabilities     = true,
-  Hash             $wrapper_conf_properties = {},
-  Boolean          $check_certificate       = true,
-  Optional[String] $java_home               = undef,
-  Optional[String] $uid                     = undef,
-  Optional[String] $gid                     = undef,
+  String            $home,
+  String            $server_url,
+  Hash              $capabilities            = {},
+  Boolean           $manage_user             = true,
+  Boolean           $manage_groups           = false,
+  Boolean           $manage_home             = true,
+  String            $username                = $title,
+  String            $group                   = $username,
+  String            $service_name            = $title,
+  Array             $user_groups             = [],
+  Boolean           $manage_capabilities     = true,
+  Hash              $wrapper_conf_properties = {},
+  Boolean           $check_certificate       = true,
+  Optional[String]  $java_home               = undef,
+  Optional[Integer] $uid                     = undef,
+  Optional[Integer] $gid                     = $uid,
 ) {
 
   # Ensure all groups are created
@@ -41,8 +41,9 @@ define bamboo_agent::agent (
     $user_groups.each |$group_name| {
       if ! defined(Group[$group_name]) {
         group { $group_name:
-          ensure => present,
-          name   => $group_name,
+          ensure     => present,
+          name       => $group_name,
+          forcelocal => true,
         }
       }
     }
@@ -50,26 +51,26 @@ define bamboo_agent::agent (
 
   # setup user
   if $manage_user == true {
-    if $uid != undef {
-      validate_re($uid, '^\d+$')
-    }
 
-    if $gid != undef {
-      validate_re($gid, '^\d+$')
-      $_gid = $gid
-    } else {
-      $_gid = $name
+    if $gid =~ Integer {
+      group { $group:
+        ensure     => present,
+        gid        => $gid,
+        system     => true,
+        forcelocal => true,
+      }
     }
 
     user { $username:
-      ensure  => present,
-      comment => "bamboo-agent ${username}",
-      home    => $home,
-      shell   => '/bin/bash',
-      groups  => $user_groups,
-      system  => true,
-      uid     => $uid,
-      gid     => $_gid,
+      ensure     => present,
+      comment    => "bamboo-agent ${username}",
+      home       => $home,
+      shell      => '/bin/bash',
+      groups     => $user_groups,
+      system     => true,
+      uid        => $uid,
+      gid        => $group,
+      forcelocal => true,
     }
   }
 
