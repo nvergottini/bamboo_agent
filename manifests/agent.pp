@@ -77,6 +77,8 @@ define bamboo_agent::agent (
     file {$home:
       ensure => directory,
       owner  => $username,
+      group  => $group,
+      mode   => '0755',
     }
   }
 
