@@ -10,12 +10,14 @@
 # @param username Username for bamboo-agent service account
 # @param group Primary group for bamboo-agent service account
 # @param user_groups A list of groups to add the bamboo-agent user too
+# @param service_name Name of bamboo-agent service
 # @param manage_capabilities Whether the module should manage the capabilities file for the agent
 # @param wrapper_conf_properties Additonal java arguments to put in wrapper.conf
 # @param check_certificate Whether to have wget check the certificate of the Bamboo server when downloading the installer jar
 # @param java_home Specify a value for the `JAVA_HOME` environment variable to include in the system init script
 # @param uid Specify a value for the bamboo agent's user id
 # @param gid Specify a value for the bamboo agent's group id
+#
 define bamboo_agent::agent (
   String            $home,
   String            $server_url,
@@ -25,8 +27,8 @@ define bamboo_agent::agent (
   Boolean           $manage_home             = true,
   String            $username                = $title,
   String            $group                   = $username,
-  String            $service_name            = $title,
   Array             $user_groups             = [],
+  String            $service_name            = $title,
   Boolean           $manage_capabilities     = true,
   Hash              $wrapper_conf_properties = {},
   Boolean           $check_certificate       = true,
@@ -34,9 +36,16 @@ define bamboo_agent::agent (
   Optional[Integer] $uid                     = undef,
   Optional[Integer] $gid                     = $uid,
 ) {
-
   # Ensure all groups are created
   if $manage_groups == true {
+    if !defined(Group[$group]) {
+      group { $group:
+        ensure     => present,
+        gid        => $gid,
+        system     => true,
+        forcelocal => true,
+      }
+    }
 
     $user_groups.each |$group_name| {
       if ! defined(Group[$group_name]) {
@@ -51,16 +60,6 @@ define bamboo_agent::agent (
 
   # setup user
   if $manage_user == true {
-
-    if $gid =~ Integer {
-      group { $group:
-        ensure     => present,
-        gid        => $gid,
-        system     => true,
-        forcelocal => true,
-      }
-    }
-
     user { $username:
       ensure     => present,
       comment    => "bamboo-agent ${username}",
@@ -75,7 +74,7 @@ define bamboo_agent::agent (
   }
 
   if $manage_home == true {
-    file {$home:
+    file { $home:
       ensure => directory,
       owner  => $username,
       group  => $group,
@@ -83,7 +82,7 @@ define bamboo_agent::agent (
     }
   }
 
-  bamboo_agent::install {$service_name:
+  bamboo_agent::install { $service_name:
     home              => $home,
     username          => $username,
     server_url        => $server_url,
@@ -96,7 +95,7 @@ define bamboo_agent::agent (
       home         => $home,
       username     => $username,
       capabilities => $capabilities,
-      require      => [ User[$username], Bamboo_agent::Install[$service_name], ],
+      require      => [User[$username], Bamboo_agent::Install[$service_name],],
       notify       => Service[$service_name],
     }
   }
@@ -106,7 +105,7 @@ define bamboo_agent::agent (
     properties => $wrapper_conf_properties + {
       'wrapper.app.parameter.2' => "${server_url}/agentServer/",
     },
-    notify     => Service[$service_name]
+    notify     => Service[$service_name],
   }
 
   bamboo_agent::service { $service_name:
@@ -116,5 +115,4 @@ define bamboo_agent::agent (
     java_home => $java_home,
     require   => Bamboo_Agent::Install[$service_name],
   }
-
 }
