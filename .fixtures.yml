@@ -2,9 +2,6 @@ fixtures:
   symlinks:
     bamboo_agent: "#{source_dir}"
   forge_modules:
-    r9util:
-      repo: "kayak/r9util"
-      ref: "0.0.9"
     stdlib:
       repo: "puppetlabs/stdlib"
-      ref: "4.6.0"
+      ref: "9.6.0"

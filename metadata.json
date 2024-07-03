@@ -1,35 +1,45 @@
 {
-  "name": "knuedge-bamboo_agent",
-  "version": "0.1.7",
-  "author": "Daniel Schaaff",
-  "summary": "Puppet module for installing and managing remote bamboo agents",
-  "license": "MIT",
-  "source": "https://github.com/knuedge/bamboo_agent",
-  "project_page": "https://github.com/knuedge/bamboo_agent/issues",
-  "issues_url": "https://github.com/knuedge/bamboo_agent",
-  "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 4.5.0"},
-    {"name":"kayak-r9util", "version_requirement":">= 0.0.9"}
-  ],
-  "requirements": [
-    {
-      "name": "puppet",
-      "version_requirement": ">= 4.0.0 < 5.0.0"
-    }
-  ],
-  "operatingsystem_support": [
-    {
-       "operatingsystem": "Ubuntu",
-       "operatingsystemrelease": ["14.04", "16.04"]
-    },
-    {
-       "operatingsystem": "RedHat",
-       "operatingsystemrelease": ["6","7"]
-    },
-    {
-       "operatingsystem": "CentOS",
-       "operatingsystemrelease": ["6","7"]
-    }
-  ]
+    "name": "knuedge-bamboo_agent",
+    "version": "0.1.7",
+    "author": "Daniel Schaaff",
+    "summary": "Puppet module for installing and managing remote bamboo agents",
+    "license": "MIT",
+    "source": "https://github.com/knuedge/bamboo_agent",
+    "project_page": "https://github.com/knuedge/bamboo_agent/issues",
+    "issues_url": "https://github.com/knuedge/bamboo_agent",
+    "dependencies": [
+        {
+            "name": "puppetlabs-stdlib",
+            "version_requirement": ">= 4.5.0"
+        },
+    ],
+    "requirements": [
+        {
+            "name": "puppet",
+            "version_requirement": ">= 7.0.0 < 8.0.0"
+        }
+    ],
+    "operatingsystem_support": [
+        {
+            "operatingsystem": "Ubuntu",
+            "operatingsystemrelease": [
+                "14.04",
+                "16.04"
+            ]
+        },
+        {
+            "operatingsystem": "RedHat",
+            "operatingsystemrelease": [
+                "6",
+                "7"
+            ]
+        },
+        {
+            "operatingsystem": "CentOS",
+            "operatingsystemrelease": [
+                "6",
+                "7"
+            ]
+        }
+    ]
 }
-
