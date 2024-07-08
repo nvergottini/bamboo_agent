@@ -34,3 +34,6 @@ pkg
 doc/
 
 .yardoc
+
+# VSCode
+.vscode/
